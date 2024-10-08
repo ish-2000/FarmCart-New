@@ -1,7 +1,7 @@
-import React from 'react';
+import React from 'react'
 
 const ProgressBar = ({ currentStep }) => {
-    const totalSteps = 3;  // Number of steps (e.g., Cart, Shipping, Payment)
+    const totalSteps = 3 // Number of steps (e.g., Cart, Shipping, Payment)
 
     return (
         <div className="flex items-center justify-center mt-3 mb-0">
@@ -17,14 +17,16 @@ const ProgressBar = ({ currentStep }) => {
                     {index < totalSteps - 1 && (
                         <div
                             className={`w-12 h-1 mx-2 transition-colors duration-300 ${
-                                index < currentStep - 1 ? 'bg-green-600' : 'bg-gray-300'
+                                index < currentStep - 1
+                                    ? 'bg-green-600'
+                                    : 'bg-gray-300'
                             }`}
                         />
                     )}
                 </div>
             ))}
         </div>
-    );
-};
+    )
+}
 
-export default ProgressBar;
+export default ProgressBar
