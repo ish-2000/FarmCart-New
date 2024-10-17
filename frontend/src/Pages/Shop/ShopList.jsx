@@ -120,9 +120,14 @@ const ShopList = () => {
                         type="text"
                         placeholder="   Search shops..."
                         value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
+                        onChange={(e) => {
+                            const value = e.target.value
+                            const regex = /^[a-zA-Z]*$/
+                            if (regex.test(value)) {
+                                setSearchTerm(value)
+                            }
+                        }}
                         className="mb-5 border border-gray-300 rounded-full p-2 w-full hover:border-green-500 focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500 transition duration-200"
-
                     />
 
                     {/* Loading Message */}
