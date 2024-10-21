@@ -4,7 +4,11 @@ const dorderSchema = new mongoose.Schema(
     {
         /* generate and store the  oID:{type: String,}, */
 
-        oID: { type: String },
+        oID: {
+            type: String,
+            required: [true, 'Order ID required'], // Ensure each order has a unique ID
+            unique: [true, 'Order already exists'],
+        },
 
         orderID: {
             type: String, // You can change this to any type or ObjectId if needed
@@ -15,11 +19,23 @@ const dorderSchema = new mongoose.Schema(
             type: String,
             required: false,
         },
+
+        customerEmail: {
+            type: String,
+            required: false,
+        },
+
+        customerNumber: {
+            type: String,
+            required: false,
+        },
         customerAddress: {
-            streetAddress: { type: String, required: false },
-            city: { type: String, required: false },
-            zipCode: { type: String, required: false },
-            district: { type: String, required: false },
+            type: String,
+            required: false,
+            // streetAddress: { type: String, required: false },
+            // city: { type: String, required: false },
+            // zipCode: { type: String, required: false },
+            // district: { type: String, required: false },
         },
         shopName: {
             type: String,
@@ -39,6 +55,16 @@ const dorderSchema = new mongoose.Schema(
                 required: [false, 'City is required'],
             },
         },
+        shopEmail: {
+            type: String,
+            required: false,
+        },
+
+        shopPhone: {
+            type: String,
+            required: false,
+        },
+
         orderStatus: {
             type: String,
             enum: ['Pending', 'Ready', 'Picked Up', 'On The Way', 'Delivered'],

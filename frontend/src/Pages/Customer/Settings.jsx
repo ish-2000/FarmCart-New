@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react'
 import axios from 'axios'
 import Address from '../../Components/Address'
 import toast from 'react-hot-toast'
+import PasswordUpdate from '../../Components/PasswordUpdate'
+import DeleteAccountButton from '../../Components/DeleteAccountButton'
 
 function Settings() {
     const [previewUrl, setPreviewUrl] = useState(null)
@@ -367,13 +369,17 @@ function Settings() {
                             >
                                 Save Changes
                             </button>
-                            <button className="bg-red-500 text-white p-2 rounded-md">
+                            {/* <button className="bg-red-500 text-white p-2 rounded-md">
                                 Delete My Account
-                            </button>
+                            </button> */}
                         </div>
                     </div>
                 </div>
                 <Address />
+                <PasswordUpdate />
+                <div className='pl-12'>
+                <DeleteAccountButton />
+                </div>
             </div>
         </div>
     )

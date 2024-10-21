@@ -59,6 +59,7 @@ const Dashboard = () => {
             } catch (error) {
                 // Log any errors that occur during the API call
                 console.error('Error fetching farmer details:', error)
+                navigate('/farmerlogin')
             }
         }
 
@@ -297,12 +298,12 @@ const Dashboard = () => {
                 </aside>
 
                 {/* Main Content */}
-                <main className="flex-1 ml-60 p-24 pt-8 overflow-y-auto ">
+                <main className="flex-1 ml-60 p-24 pt-16 overflow-y-auto ">
                     <div className="mb-8">
                         {/* Profile and Details Section */}
                         <div className="flex space-x-8 mb-8">
                             {/* Profile Card */}
-                            <div className="bg-green-50 p-6 rounded-lg shadow-md w-2/3">
+                            <div className="bg-white p-6 rounded-lg  shadow-md w-2/3">
                                 <div className="flex flex-col items-center">
                                     <img
                                         className="w-24 h-24 rounded-full object-cover"
@@ -325,7 +326,7 @@ const Dashboard = () => {
                             </div>
 
                             {/* Details Card */}
-                            <div className="bg-green-50 p-6 rounded-lg shadow-md w-2/3 flex flex-col items-center ">
+                            <div className="bg-white p-6 rounded-lg  shadow-md w-2/3 flex flex-col items-center ">
                                 <h3 className="text-lg font-semibold text-gray-800 mb-4">
                                     Address
                                 </h3>
@@ -346,7 +347,7 @@ const Dashboard = () => {
                     </div>
 
                     {/* Orders Section */}
-                    <div className="bg-white p-6 rounded-lg shadow-md w-full border-2 border-green-400 focus:outline-none focus:ring-2 focus:ring-green-500">
+                    <div className="bg-white p-6 rounded-lg shadow-md w-full border-2  focus:outline-none focus:ring-2 focus:ring-green-500">
                         <div className="flex justify-between items-center mb-4">
                             <h3 className="text-lg font-semibold text-gray-800">
                                 My Orders
@@ -489,13 +490,25 @@ const Dashboard = () => {
                                                 <option value="Ready">
                                                     Ready
                                                 </option>
-                                                <option value="Pickup">
+                                                <option
+                                                    value=" Ready. "
+                                                    disabled
+                                                >
+                                                    Ready
+                                                </option>
+                                                <option value="PickUp" disabled>
                                                     Pickup
                                                 </option>
-                                                <option value="OnTheWay">
+                                                <option
+                                                    value="OnTheWay"
+                                                    disabled
+                                                >
                                                     On the way
                                                 </option>
-                                                <option value="Delivered">
+                                                <option
+                                                    value="Delivered"
+                                                    disabled
+                                                >
                                                     Delivered
                                                 </option>
                                             </select>

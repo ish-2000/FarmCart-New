@@ -71,7 +71,13 @@ const ShopPage = () => {
                         type="text"
                         placeholder=" Search products..."
                         value={searchTerm}
-                        onChange={handleSearch}
+                        onChange={(e) => {
+                            const value = e.target.value
+                            const regex = /^[a-zA-Z]*$/
+                            if (regex.test(value)) {
+                                setSearchTerm(value)
+                            }
+                        }}
                         className="border border-gray-300 rounded-full p-2 w-full hover:border-green-500 focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500 transition duration-200"
                     />
                 </div>

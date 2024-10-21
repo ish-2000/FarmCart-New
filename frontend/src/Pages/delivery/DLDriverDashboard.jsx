@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import DeliverySidebar from '../../Components/delivery/DeliverySidebar'
+import Loading from '../../Components/Loading'
+
 import {
     FaCheck,
     FaTruck,
@@ -13,6 +15,7 @@ const DLDriverDashboard = () => {
     const [driver, setDriver] = useState(null)
     const [loading, setLoading] = useState(true)
     const [isAvailable, setIsAvailable] = useState(false) // State for availability
+    const [nicMatchesPassword, setNicMatchesPassword] = useState(false) // State for NIC and password check
     const [ongoingDeliveries, setOngoingDeliveries] = useState([]) // State for ongoing deliveries
     const navigate = useNavigate()
 
@@ -32,6 +35,17 @@ const DLDriverDashboard = () => {
                 })
                 setDriver(data) // Set driver data from the response
                 setIsAvailable(data.isAvailable) // Set initial availability
+
+                // Check if NIC and password are the same
+                const nicCheckRes = await axios.get(
+                    '/api/drivers/nic-password-check',
+                    {
+                        headers: {
+                            Authorization: `Bearer ${driverToken}`, // Pass token in headers
+                        },
+                    }
+                )
+                setNicMatchesPassword(nicCheckRes.data.nicMatchesPassword) // Set NIC and password equality check result
 
                 // Fetch ongoing deliveries assigned to this driver
                 const deliveriesRes = await axios.get(
@@ -115,7 +129,13 @@ const DLDriverDashboard = () => {
         navigate(`/driver/delivery/${deliveryId}`) // Redirect to delivery view page
     }
 
-    if (loading) return <div>Loading...</div>
+    if (loading) {
+        return (
+            <div className="flex flex-1 min-h-screen justify-center items-center">
+                <Loading />
+            </div>
+        )
+    }
 
     // Helper function to render delivery status with icons
     const renderDeliveryStatus = (status) => {
@@ -162,11 +182,12 @@ const DLDriverDashboard = () => {
             {/* Main content */}
             <main className="flex-1 ml-64 p-16 overflow-y-auto">
                 {/* NIC and Password Equality Check */}
-                {driver && driver.idCardNumber === driver.password && (
+                {nicMatchesPassword && (
                     <div className="bg-red-500 text-white p-4 rounded-md mb-6 text-center">
                         <strong>Warning:</strong> Your NIC number and password
                         are the same. Please update your password for better
-                        security.
+                        security. When you change the password, you can assign
+                        orders.
                     </div>
                 )}
 
@@ -190,16 +211,20 @@ const DLDriverDashboard = () => {
                                 </p>
                             </div>
                             <div className="flex space-x-2">
-                                <button
-                                    onClick={toggleAvailability}
-                                    className={`px-4 py-2 text-white font-bold rounded-md ${
-                                        isAvailable
-                                            ? 'bg-green-500 hover:bg-green-600'
-                                            : 'bg-red-500 hover:bg-red-600'
-                                    }`}
-                                >
-                                    {isAvailable ? 'Available' : 'Unavailable'}
-                                </button>
+                                {!nicMatchesPassword && (
+                                    <button
+                                        onClick={toggleAvailability}
+                                        className={`px-4 py-2 text-white font-bold rounded-md ${
+                                            isAvailable
+                                                ? 'bg-green-500 hover:bg-green-600'
+                                                : 'bg-red-500 hover:bg-red-600'
+                                        }`}
+                                    >
+                                        {isAvailable
+                                            ? 'Available'
+                                            : 'Unavailable'}
+                                    </button>
+                                )}
                                 <button
                                     onClick={handleLogout}
                                     className="px-4 py-2 bg-red-500 text-white font-bold rounded-md hover:bg-red-600"
