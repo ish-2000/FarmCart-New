@@ -12,6 +12,13 @@ services:
     deploy:
       mode: replicated
       replicas: 2
+    healthcheck:
+      test: ["CMD", "curl", "-f", "api:5002/health"]  # Use service name instead of localhost
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 5s
+    
     # ports:
     #   - "5002:5002"  # Expose the API on port 5002 for internal communication
 
@@ -21,6 +28,7 @@ services:
       dockerfile: Dockerfile.prod  # This Dockerfile serves React with Caddy
       args:
         - VITE_STRIPE_PUBLIC_KEY=pk_test_51LMEvTC05RrpHY1zUINiBb70Oue9TVmbH9LoKTZKKa0Ra3a8J188Ph3kouCpSeLJUr7qCgndpWlAXwt5GVlZOLIY00SkMj6avh
+        - VITE_MAPBOX_API_KEY=pk.eyJ1IjoibGtzbmp3IiwiYSI6ImNtMjA2c3ZkOTBiYWwyaXF2M2lqM2tleTQifQ.DZLGqlXwdK7VmyE1zlpxDg
     restart: unless-stopped
     env_file: ./frontend/.env.prod
     ports:
@@ -34,6 +42,7 @@ services:
       - api
     networks:
       - app-network-caddy
+
 
 networks:
   app-network-caddy:

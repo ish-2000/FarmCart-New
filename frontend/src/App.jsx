@@ -12,7 +12,7 @@ import DLayout from './Layouts/DLayout'
 import SidebarLayout from './Layouts/SidebarLayout' // Layout with Sidebar
 import PrivateRoute from './Components/PrivateRoute'
 import FarmerLayout from './Layouts/FarmerLayout'
-import Farmer_sidebar from './Components/farmer/Farmer_sidebar'
+// import Farmer_sidebar from './Components/farmer/Farmer_sidebar'
 
 // Customer Pages
 import HomePage from './Pages/HomePage'
@@ -41,13 +41,17 @@ import Cart from './Pages/order/Cart'
 import CheckOut from './Pages/order/checkOut'
 
 //Admin
-import DashboardLayout from './Components/Admin/DashboardLayout'
-import CustomerPage from './Components/Admin/CustomerPage'
-import StaffPage from './Components/Admin/StaffPage'
-import PromotionPage from './Components/Admin/PromotionPage'
-import FinancialAnalysisPage from './Components/Admin/FinancialAnalysisPage'
-import CreateStaff from './Components/Admin/AdminCreateStaffPage'
-import CreateCustomer from './Components/Admin/AdminCreateCustomerPage'
+import Staff from './Pages/Admin/Astaff'
+import AdminDashboard from './Pages/Admin/Adashboard'
+import Users from './Pages/Admin/Ausers'
+import Finance from './Pages/Admin/Afinance'
+import Coupens from './Pages/Admin/Acoupons'
+import AddStaff from './Pages/Admin/AaddStaff'
+import UpdateStaff from './Pages/Admin/AupdateStaff'
+import AddCoupon from './Pages/Admin/AaddCoupons'
+import UpdateCoupon from './Pages/Admin/AupdateCoupon'
+import AdminLayout from './Layouts/Alayout'
+import AdminLogin from './Components/Admin/admnlogins'
 
 // Farmer Pages
 import FarmerLogin from './Pages/farmer/FarmerLogin'
@@ -68,7 +72,6 @@ import DLDriverRegistrationForm from './Pages/delivery/DLDriverRegistrationForm'
 import DLApproveDriver from './Pages/delivery/DLApproveDriver' // Ensure the path is correct
 import DLDriverAccept from './Pages/delivery/DLDriverAccept'
 import DLImageUpload from './Pages/delivery/DLImageUpload'
-import DLSendEmail from './Pages/delivery/DLSendEmail' // Import the DLSendEmail component
 import DLLogin from './Pages/delivery/DLLogin' // Added DLLogin import
 
 import DeliveryDashboard from './Pages/delivery/DLDriverDashboard'
@@ -87,6 +90,27 @@ import DLViewDelivery from './Pages/delivery/DLviewDelivery' // Import the
 import OngoingDelivery from './Pages/delivery/driver/OngoingDelivery' // Import the OngoingDelivery component
 import ViewDelivery from './Pages/delivery/driver/ViewDelivery' // Import the ViewDelivery page
 import ViewDeliveries from './Pages/delivery/driver/ViewDeliveries' // Import the ViewDeliveries page
+// import DLMap from './Pages/delivery/DLMap' // Import the DLMap component
+import IncomePage from './Pages/delivery/driver/incomepage' // Import the DLList component
+import StaffPrivateRoute from './Components/Admin/AstaffPrivateRoute'
+
+//Blog
+
+import Blog from './Pages/blog manage/AddBlog'
+import BlogList from './Pages/blog manage/BlogList'
+import TourismBlog from './Pages/blog manage/UserBlog'
+import IndividualBlog from './Pages/blog manage/InduvidualBlog'
+import Admin from './Pages/dashboard/Admin'
+import UpdateBlogDashboard from './Pages/dashboard/ishanka dahsbaord/UpdateBlogDashbaord'
+import SpeechGenerator from './Pages/common/speech/SpeechGenerator'
+import BlogLayout from './Layouts/BlogLayout'
+
+//Help & Support
+import HelpLayout from './Layouts/HelpLayout'
+import Help from './Pages/Help/Help'
+import SupportTicket from './Pages/Help/SupportTicket'
+import Feedback from './Pages/Help/Feedback'
+import ManageShopIncome from './Pages/Admin/ManageShopIncome'
 
 // Define all routes in a single Router
 const router = createBrowserRouter(
@@ -170,49 +194,81 @@ const router = createBrowserRouter(
             </Route>
 
             {/* Admin Routes */}
-            <Route path="/">
-                <Route path="/Admindashboard" element={<DashboardLayout />} />
-                <Route
-                    path="/Admindashboard/customer"
-                    element={<CustomerPage />}
-                />
-                <Route path="/Admindashboard/staff" element={<StaffPage />} />
-                <Route
-                    path="/Admindashboard/offers"
-                    element={<PromotionPage />}
-                />
-                <Route
-                    path="/Admindashboard/financial-analysis"
-                    element={<FinancialAnalysisPage />}
-                />
-                <Route
-                    path="/Admindashboard/staff/create"
-                    element={<CreateStaff />}
-                />{' '}
-                {/* Updated path */}
-                <Route
-                    path="/Admindashboard/Customer/create"
-                    element={<CreateCustomer />}
-                />
+            <Route path="/" element={<AdminLayout />}>
+                <Route path="/Admin" element={<AdminLogin />} />
+                <Route element={<StaffPrivateRoute />}>
+                    <Route
+                        path="/AdminDashboard"
+                        element={<AdminDashboard />}
+                    />
+
+                    {/* Staff */}
+                    <Route path="/staff" element={<Staff />} />
+                    <Route path="/addstaff" element={<AddStaff />} />
+                    <Route path="/UpdateStaff/:id" element={<UpdateStaff />} />
+
+                    {/* users */}
+                    <Route path="/users" element={<Users />} />
+
+                    {/* Coupon */}
+                    <Route path="/coupons" element={<Coupens />} />
+                    <Route path="/addcoupons" element={<AddCoupon />} />
+                    <Route
+                        path="/updatecoupon/:id"
+                        element={<UpdateCoupon />}
+                    />
+                    <Route path="/coupens" element={<Coupens />} />
+                    <Route path="/finance" element={<Finance />} />
+                    <Route
+                        path="/manage-shop-income"
+                        element={<ManageShopIncome />}
+                    />
+                </Route>
+
+                {/* 
+                <Route path="/dashboard" element={< Dashboard/>} />
+                 */}
+
+                {/* Catch-all for 404 */}
                 <Route path="*" element={<NotFound />} />
             </Route>
 
             {/* delivery and driver Routes */}
             <Route path="/" element={<DLayout />}>
                 <Route
+                    path="/manager"
+                    element={<AdminLogin manager={true} />}
+                />
+                <Route element={<StaffPrivateRoute manager={true} />}>
+                    <Route
+                        path="/manager/approve-driver"
+                        element={<DLApproveDriver />}
+                    />
+                    <Route
+                        path="/manager/approve-driver/:id"
+                        element={<DLDriverAccept />}
+                    />
+                    {/*<Route path="/manager/approve-driver/:id/send-email" element={<DLSendEmail />} />*/}
+                    <Route path="/alldrivers" element={<DLALLdrivers />} />
+                    <Route
+                        path="/manager/dashboard"
+                        element={<DLmanageDash />}
+                    />
+                    <Route
+                        path="/manager/view-driver/:id"
+                        element={<DLViewDriver />}
+                    />
+
+                    <Route
+                        path="/manager/delivery/:id"
+                        element={<DLViewDelivery />}
+                    />
+                </Route>
+                <Route
                     path="/register-driver"
                     element={<DLDriverRegistrationForm />}
                 />
                 <Route path="/upload-image" element={<DLImageUpload />} />
-                <Route
-                    path="/manager/approve-driver"
-                    element={<DLApproveDriver />}
-                />
-                <Route
-                    path="/manager/approve-driver/:id"
-                    element={<DLDriverAccept />}
-                />
-                {/*<Route path="/manager/approve-driver/:id/send-email" element={<DLSendEmail />} />*/}
                 <Route path="/driver/login" element={<DLLogin />} />{' '}
                 {/* Driver Login Route */}
                 <Route
@@ -225,22 +281,12 @@ const router = createBrowserRouter(
                     path="/driver/profile/edit"
                     element={<DLEditProfile />}
                 />
-                <Route path="/alldrivers" element={<DLALLdrivers />} />
-                <Route path="/manager/dashboard" element={<DLmanageDash />} />
-                <Route
-                    path="/manager/view-driver/:id"
-                    element={<DLViewDriver />}
-                />
                 <Route path="/driver/logout" element={<DLlogout />} />
                 <Route path="/driver/edit/:id" element={<DLeditdriver />} />
                 <Route path="/a" element={<OrderForm />} />
                 <Route path="/b" element={<OrderTable />} />
                 <Route path="/d" element={<Od />} />
                 <Route path="/DLAllDeliveries" element={<DLAllDeliveries />} />
-                <Route
-                    path="/manager/delivery/:id"
-                    element={<DLViewDelivery />}
-                />
                 <Route path="/ongoing" element={<OngoingDelivery />} />
                 <Route
                     path="/driver/delivery/:id"
@@ -248,10 +294,38 @@ const router = createBrowserRouter(
                 />{' '}
                 {/* Route for viewing a specific delivery */}
                 <Route path="/driver/deliveries" element={<ViewDeliveries />} />
+                <Route path="/driver/income" element={<IncomePage />} />
+                {/* <Route path="/driver/map" element={<DLMap />} /> */}
                 <Route path="*" element={<NotFound />} />
             </Route>
 
             {/* Add Other Roots Below */}
+
+            {/* Help & Support Routes */}
+            <Route path="/" element={<HelpLayout />}>
+                <Route path="/help" element={<Help />} />
+                <Route
+                    path="/help/support-ticket"
+                    element={<SupportTicket />}
+                />
+                <Route path="/help/feedback" element={<Feedback />} />
+                <Route path="*" element={<NotFound />} />
+            </Route>
+
+            {/*Blog route*/}
+
+            <Route path="/" element={<BlogLayout />}>
+                <Route path="/add-blog" element={<Blog />} />
+                <Route path="/blog-list" element={<BlogList />} />
+                <Route
+                    path="/update-blog/:id"
+                    element={<UpdateBlogDashboard />}
+                />
+                <Route path="/Blog" element={<TourismBlog />} />
+                <Route path="/blog/:id" element={<IndividualBlog />} />
+                <Route path="/speechgenerator" element={<SpeechGenerator />} />
+                <Route path="/blogDashboard" element={<Admin />} />
+            </Route>
         </>
     )
 )

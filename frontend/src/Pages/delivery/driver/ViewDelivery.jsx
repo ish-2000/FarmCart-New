@@ -5,12 +5,16 @@ import jsPDF from 'jspdf'
 import 'jspdf-autotable' // Import jsPDF-autotable for table formatting
 import farmcartLogo from '../../../assets/logo.png' // Make sure you have your logo here
 import DLmanageSidebar from '../../../Components/delivery/DeliverySidebar' // Sidebar component
+import Loading from '../../../Components/Loading'
 
 const DLViewDelivery = () => {
     const { id } = useParams() // Get the delivery ID from the URL
     const [delivery, setDelivery] = useState(null) // State for storing delivery data
     const [driver, setDriver] = useState(null) // State for driver info
+    const [customer, setCustomer] = useState(null) // State for driver info
+
     const [loading, setLoading] = useState(true)
+
     const driverToken = localStorage.getItem('driverToken') // Get driver token from localStorage
     const navigate = useNavigate()
 
@@ -47,62 +51,190 @@ const DLViewDelivery = () => {
         fetchDelivery()
     }, [driverToken, id, navigate])
 
-    if (loading) return <div className="text-center mt-10">Loading...</div>
+    if (loading) {
+        return (
+            <div className="flex flex-1 min-h-screen justify-center items-center">
+                <Loading />
+            </div>
+        )
+    }
 
-    // Function to generate the PDF
     const generatePDF = () => {
-        const doc = new jsPDF()
+        const doc = new jsPDF('p', 'mm', 'a4') // Ensure A4 size document
 
-        // Add logo
-        doc.addImage(farmcartLogo, 'PNG', 10, 10, 50, 20) // Add logo with width and height
+        // 1. Add the logo and company details
+        addLogoAndCompanyInfo(doc)
 
-        // Add title
-        doc.setFontSize(22)
-        doc.text('Delivery Details', 105, 40, null, null, 'center') // Title centered at the top
+        // 2. Add a bold main title
+        addMainTitle(doc)
 
-        // Add company name
+        // 3. Add a line divider below the title and company info
+        addDivider(doc, 60) // Positioned at y=60 to be below the title and company details
+
+        // 4. Add tracking and issued details (tracking ID, dates, delivery status, etc.)
+        addTrackingAndIssuedDetails(doc)
+
+        // 5. Add delivery details in a table format
+        addDeliveryDetailsTable(doc)
+
+        // 6. Add footer with generated information and signature
+        addFooter(doc)
+
+        // 7. Save the PDF with a dynamic name based on the delivery tracking ID
+        doc.save(`Delivery_${delivery.trackingID}.pdf`)
+    }
+
+    // Function to add the logo and company information
+    const addLogoAndCompanyInfo = (doc) => {
+        // Add the logo at the top, aligned to the left
+        doc.addImage(farmcartLogo, 'PNG', 10, 10, 50, 20)
+
+        // Add the company information to the right of the logo
         doc.setFontSize(12)
-        doc.text('FarmCart Lanka (PVT.) LTD', 105, 50, null, null, 'center')
-        doc.text('No.78, Malabe, Colombo', 105, 55, null, null, 'center')
-        doc.text('(+94) 011 34 56 837', 105, 60, null, null, 'center')
-        doc.text('www.farmcart.com', 105, 65, null, null, 'center')
+        doc.text('FarmCart Lanka (PVT.) LTD', 190, 15, null, null, 'right')
+        doc.text('No.78, Malabe, Colombo', 190, 20, null, null, 'right')
+        doc.text('(+94) 011 34 56 837', 190, 25, null, null, 'right')
+        doc.text('contact@farmcart.com', 190, 30, null, null, 'right')
+        doc.text('www.farmcart.com', 190, 35, null, null, 'right')
+    }
 
-        // Move down to add delivery details table
+    // Function to add the bold main title
+    const addMainTitle = (doc) => {
+        // Set font to bold and add the main title
+        doc.setFontSize(24)
+        doc.setFont('helvetica', 'bold') // Set font to bold
+        doc.setTextColor(40)
+        doc.text('Delivery Details Report', 105, 50, null, null, 'center') // Title centered at the top
+    }
+
+    // Function to add tracking ID, assigned date (issued date), delivered date, and other details
+    const addTrackingAndIssuedDetails = (doc) => {
+        // Add the main title
+        doc.setFontSize(24)
+        doc.setFont('helvetica', 'bold') // Set font to bold
+        doc.setTextColor(40)
+        doc.text('Delivery Details Report', 105, 50, null, null, 'center') // Title centered at the top
+
+        // Add tracking ID, assigned date (as Issued Date), and delivered date or "Ongoing"
         doc.setFontSize(12)
-        doc.text('Delivery Information', 14, 80) // Left-aligned delivery information
+        doc.setFont('helvetica', 'normal') // Reset font to normal
 
-        // Create a table with delivery details
+        // Tracking ID
+        doc.text(`Tracking ID: ${delivery.trackingID}`, 14, 70) // Left-aligned tracking ID
+
+        // Assigned Date (as Issued Date)
+        doc.text(
+            `Assigned Date: ${new Date(delivery.assignDateTime).toLocaleDateString()}`,
+            190,
+            70,
+            null,
+            null,
+            'right'
+        ) // Right-aligned assigned date
+
+        // Delivery Status
+        doc.text(`Delivery Status: ${delivery.deliveryStatus}`, 14, 75) // Left-aligned delivery status
+
+        // Delivered Date or Ongoing
+        const deliveredText = delivery.deliveredDateTime
+            ? new Date(delivery.deliveredDateTime).toLocaleDateString() // Delivered Date
+            : 'Ongoing' // If not delivered
+        doc.text(
+            `Delivered Date: ${deliveredText}`,
+            190,
+            75,
+            null,
+            null,
+            'right'
+        ) // Right-aligned delivered/ongoing date
+    }
+
+    // Function to add a divider line
+    const addDivider = (doc, yPos) => {
+        doc.setLineWidth(0.5)
+        doc.line(10, yPos, 200, yPos) // Horizontal line from x=10 to x=200
+    }
+
+    // Function to add delivery details in a table
+    const addDeliveryDetailsTable = (doc) => {
         doc.autoTable({
-            startY: 85, // Starting position on the Y-axis
-            head: [['Field', 'Details']], // Table headers
+            startY: 90, // Start below the divider line
+            head: [['#', 'Field', 'Details']], // Add numbering in the table header
             body: [
-                ['Tracking ID', delivery.trackingID],
-                ['Order ID', delivery.oID],
-                ['Driver Name', driver?.firstName + ' ' + driver?.lastName], // Adding driver name
-                ['Driver ID', delivery.drID],
-                ['Shop Name', delivery.shopName],
-                ['Pickup Address', delivery.pickupAddress],
-                ['Customer Name', delivery.customerName || 'N/A'],
-                ['Dropoff Address', delivery.dropOffAddress],
+                ['1', 'Tracking ID', delivery.trackingID],
+                ['2', 'Order ID', delivery.oID],
                 [
+                    '3',
+                    'Driver Name',
+                    driver?.firstName + ' ' + driver?.lastName,
+                ],
+                ['4', 'Driver ID', delivery.drID],
+                ['5', 'Shop Name', delivery.shopName],
+                ['6', 'Shop Contact Number', delivery.shopPhone],
+                ['7', 'Shop Email', delivery.shopEmail],
+                ['8', 'Pickup Address', delivery.pickupAddress],
+                ['9', 'Customer Name', delivery.customerName || 'N/A'],
+                [
+                    '10',
+                    'Customer Contact Number',
+                    delivery.customerNumber || 'N/A',
+                ],
+                ['11', 'Customer Email', delivery.customerEmail || 'N/A'],
+                ['12', 'Dropoff Address', delivery.dropOffAddress],
+                [
+                    '13',
                     'Assigned Time',
                     new Date(delivery.assignDateTime).toLocaleString(),
                 ],
-                ['Delivery Status', delivery.deliveryStatus],
+                ['14', 'Delivery Status', delivery.deliveryStatus],
                 [
+                    '15',
                     'Delivered Time',
                     delivery.deliveredDateTime
                         ? new Date(delivery.deliveredDateTime).toLocaleString()
                         : 'Ongoing',
                 ],
             ],
-            theme: 'grid', // Use grid theme for the table
-            headStyles: { fillColor: [46, 204, 113] }, // Green background for headers
+            theme: 'grid', // Table theme
+            headStyles: { fillColor: [46, 204, 113] }, // Green background for table headers
             bodyStyles: { textColor: [0, 0, 0] }, // Black text color for table body
         })
+    }
 
-        // Save the PDF with a dynamic name based on the delivery tracking ID
-        doc.save(`Delivery_${delivery.trackingID}.pdf`)
+    // Function to add footer
+    const addFooter = (doc) => {
+        // Add "Generated at" timestamp at the bottom
+        const generatedAt = new Date().toLocaleString()
+        doc.setFontSize(12)
+        doc.text(
+            `Generated at: ${generatedAt}`,
+            14,
+            doc.autoTable.previous.finalY + 20
+        )
+
+        // Add "Generated by" section at the bottom
+        doc.text('Generated by:', 14, doc.autoTable.previous.finalY + 30)
+        doc.text(
+            `${driver?.firstName + ' ' + driver?.lastName}`, // Driver's full name
+            14,
+            doc.autoTable.previous.finalY + 35 // Positioning below "Generated by"
+        )
+
+        // Placeholder for signature
+        doc.text(
+            '__________________________',
+            14,
+            doc.autoTable.previous.finalY + 45
+        )
+        doc.text('Signature', 14, doc.autoTable.previous.finalY + 50)
+    }
+
+    if (loading) {
+        return (
+            <div className="flex flex-1 min-h-screen justify-center items-center">
+                <Loading />
+            </div>
+        )
     }
 
     return (
@@ -138,12 +270,25 @@ const DLViewDelivery = () => {
                                         ['Driver ID', delivery.drID],
                                         ['Shop Name', delivery.shopName],
                                         [
+                                            'Shop ContactNumber',
+                                            delivery.shopPhone,
+                                        ],
+                                        ['Shop Email', delivery.shopEmail],
+                                        [
                                             'Pickup Address',
                                             delivery.pickupAddress,
                                         ],
                                         [
                                             'Customer Name',
                                             delivery.customerName || 'N/A',
+                                        ],
+                                        [
+                                            'Customer ContactNumber',
+                                            delivery.customerNumber || 'N/A',
+                                        ],
+                                        [
+                                            'Customer Email',
+                                            delivery.customerEmail || 'N/A',
                                         ],
                                         [
                                             'Dropoff Address',
@@ -170,7 +315,12 @@ const DLViewDelivery = () => {
                                     ].map(([field, value], index) => (
                                         <tr
                                             key={index}
-                                            className="hover:bg-gray-100 cursor-pointer"
+                                            className={`hover:bg-gray-100 cursor-pointer ${
+                                                field === 'Pickup Address' ||
+                                                field === 'Dropoff Address'
+                                                    ? 'bg-green-200 font-bold'
+                                                    : ''
+                                            }`}
                                         >
                                             <td className="py-4 px-6 font-medium text-lg">
                                                 {field}

@@ -114,9 +114,9 @@ const assignReadyOrders = async () => {
                 orderID: order._id.toString(),
             })
             if (existingDelivery) {
-                console.log(
-                    `Order with ID ${order._id} already exists in DLDelivery.`
-                )
+                // console.log(
+                // `Order with ID ${order._id} already exists in DLDelivery.`
+                // )
                 continue // Skip this order if it already exists in DLDelivery
             }
 
@@ -148,22 +148,32 @@ const assignReadyOrders = async () => {
             const customerName =
                 `${user.firstname || ''} ${user.lastname || ''}`.trim()
 
-            // Use the defaultAddress from the User model
-            const customerAddress = {
-                streetAddress: user.defaultAddress.streetAddress || 'N/A',
-                city: user.defaultAddress.city || 'N/A',
-                zipCode: user.defaultAddress.zipCode || 'N/A',
-                district: user.defaultAddress.district || 'N/A',
-            }
-            // console.log(`Customer Address: ${customerAddress.streetAddress}, ${customerAddress.city}`)
+            // // Use the defaultAddress from the User model
+            // const customerAddress = {
+            //     streetAddress: user.defaultAddress.streetAddress || 'N/A',
+            //     city: user.defaultAddress.city || 'N/A',
+            //     zipCode: user.defaultAddress.zipCode || 'N/A',
+            //     district: user.defaultAddress.district || 'N/A',
+            // }
+            // // console.log(`Customer Address: ${customerAddress.streetAddress}, ${customerAddress.city}`)
+
+            // Extract the shippingAddress fields from the user
+            const { name, address, city, phone, email } = order.shippingAddress
+
+            // Combine address and city into a single string
+            const cusAddress = `${address}, ${city}`
 
             // Create a new dOrder with the customer and shop address and order data
             const newDOrder = new dOrder({
                 oID: order._id.toString(), // Assigning the order ID from the Order model
                 orderID: generateOrderId(), // Randomly generated order ID
                 customerName: customerName, // Full name from User model
-                customerAddress: customerAddress, // Address from User model
+                customerEmail: email, // Email from User model
+                customerNumber: phone, // Phone number from User model
+                customerAddress: cusAddress, // Address from User model
                 shopName: shop.name, // Shop name from the Shop model
+                shopEmail: shop.email, // Shop email from the Shop model
+                shopPhone: shop.contactNumber, // Shop phone from the Shop model
                 shopAddress: {
                     houseNo: shop.address.houseNo, // House number from the Shop model
                     streetName: shop.address.streetName, // Street name from the Shop model
@@ -183,7 +193,7 @@ const assignReadyOrders = async () => {
             /*console.log(`Order with ID ${order._id} has been successfully assigned to dOrder with new orderID ${newDOrder.orderID}.`)*/
 
             // After saving the new dOrder, update the order status to "Assigning" in the Order model
-            order.orderStatus = ' .Ready. '
+            order.orderStatus = ' Ready. '
             await order.save() // Save the updated order
             // console.log(`Order with ID ${order._id} has been marked as "Assigning" in the Order model.`)
         }
@@ -234,11 +244,11 @@ const syncDeliveryAndOrderStatus = async () => {
 // Function to repeatedly check for ready orders every 5 seconds
 const startOrderAssignment = () => {
     /* console.log('Starting periodic check for ready orders...')*/
-    setInterval(assignReadyOrders, 5000) // Run the check every 5 seconds
+    setInterval(assignReadyOrders, 1000) // Run the check every 5 seconds
 }
 
 const startSyncDeliveryOrderStatus = () => {
-    setInterval(syncDeliveryAndOrderStatus, 5000) // Run every 5 seconds
+    setInterval(syncDeliveryAndOrderStatus, 1000) // Run every 5 seconds
 }
 
 export { startSyncDeliveryOrderStatus }
