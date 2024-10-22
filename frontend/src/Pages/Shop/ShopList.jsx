@@ -118,7 +118,7 @@ const ShopList = () => {
                     {/* Search Bar */}
                     <input
                         type="text"
-                        placeholder="   Search shops..."
+                        placeholder="Search shops..."
                         value={searchTerm}
                         onChange={(e) => {
                             const value = e.target.value
@@ -127,7 +127,7 @@ const ShopList = () => {
                                 setSearchTerm(value)
                             }
                         }}
-                        className="mb-5 border border-gray-300 rounded-full p-2 w-full hover:border-green-500 focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500 transition duration-200"
+                        className="mb-5 border border-gray-300 rounded-full p-2 w-full hover:border-green-500 focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500 transition duration-200 pl-4"
                     />
 
                     {/* Loading Message */}
