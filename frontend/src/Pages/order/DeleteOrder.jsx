@@ -78,4 +78,3 @@ DeleteOrder.propTypes = {
 }
 
 export default DeleteOrder
-
